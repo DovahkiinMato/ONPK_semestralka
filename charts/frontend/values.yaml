@@ -1,0 +1,21 @@
+# Default values for webapp.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+nameOverride: ""
+fullnameOverride: ""
+
+services:
+  frontend:
+    replicaCount: 3 
+    
+    image:
+      repository: matejbabic/onpk-frontend
+      pullPolicy: Always
+      tag: "" # can leave empty for the "latest" tag
+
+    env:
+      - name: REACT_APP_APIHOSTPORT
+        value: "backend.mbabic.com"
+    
+    ingress:
+      host: "frontend.mbabic.com"

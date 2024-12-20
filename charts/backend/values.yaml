@@ -1,0 +1,76 @@
+nameOverride: ""
+fullnameOverride: ""
+
+services:
+  backend:
+    replicaCount: 1 
+    
+    image:
+      repository: matejbabic/onpk-backend
+      pullPolicy: Always
+      tag: "" # can leave empty for the "latest" tag
+
+    env:
+      - name: MONGO_CONN_STR
+        value: "mongodb://mongodb:27017/maindb"
+      - name: MONGO_USERNAME
+        value: admin
+      - name: MONGO_PASSWORD
+        value: password
+      - name: MONGO_AUTH_SOURCE
+        value: platformsdb
+    
+    ingress:
+      host: "backend.mbabic.com"
+
+mongodb:
+  persistence:
+    enabled: false
+
+  service:
+    nameOverride: "mongodb"
+    type: ClusterIP
+  
+  initdbScripts:
+    init_script.js: |
+      db = db.getSiblingDB("platformsdb");
+      db.createUser({
+        user: "admin",
+        pwd: "password",
+        roles:[{role: "readWrite" , db:"platformsdb"}]
+      });
+      db.createCollection("platforms");
+      db.platforms.insertMany(
+       [
+         {
+              "name": "openshift",
+              "codedetail": {
+                  "usecase": "Container platform",
+                  "rank": 12,
+                  "homepage": "https://openshift.com",
+                  "download": "https://developers.redhat.com/products/codeready-containers/overview",
+                  "votes": 0
+              }
+          },
+          {
+              "name": "kubernetes",
+              "codedetail": {
+                  "usecase": "Container orchestration platform ",
+                  "rank": 38,
+                 "homepage": "https://kubernetes.com",
+                  "download": "https://kubernetes.io/docs/tasks/tools/install-minikube/",
+                  "votes": 0
+              }
+          },
+          {
+              "name": "rancher",
+              "codedetail": {
+                  "usecase": "Container platform management ",
+                  "rank": 50,
+                  "homepage": "https://rancher.com/",
+                  "download": "https://github.com/rancher/rancher",
+                  "votes": 0
+              }
+          }
+        ]    
+      );

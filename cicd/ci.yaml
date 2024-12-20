@@ -1,0 +1,45 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: clone-build-push
+spec:
+  description: Clones a git repo, builds a container image with Kaniko and pushes it to a registry
+  params:
+    - name: git-repository-url
+      type: string
+    - name: path-in-git-repo
+      type: string
+    - name: container-repo-url
+      type: string
+
+  workspaces:
+    - name: git-repo
+    - name: docker-config
+
+  tasks:
+    - name: fetch-source
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: git-repo
+      params:
+        - name: url
+          value: $(params.git-repository-url)
+        - name: revision
+          value: main
+    
+    - name: build-push
+      taskRef:
+        name: kaniko
+      workspaces:
+        - name: source
+          workspace: git-repo
+        - name: dockerconfig
+          workspace: docker-config
+      params:
+        - name: IMAGE
+          value: $(params.container-repo-url):latest
+        - name: CONTEXT
+          value: $(params.path-in-git-repo)
+  

@@ -1,0 +1,59 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: clone-build-push-run-frontend
+spec:
+  pipelineRef:
+    name: clone-build-push
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  workspaces:
+    - name: git-repo
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+    - name: docker-config
+      secret:
+        secretName: docker-config
+  params:
+    - name: git-repository-url
+      value: https://github.com/DovahkiinMato/ONPK_semestralka.git
+    - name: container-repo-url
+      value: docker.io/matejbabic/onpk-frontend
+    - name: path-in-git-repo
+      value: apps/zauni-zadanie-appfrontend-2024
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: clone-build-push-run-backend
+spec:
+  pipelineRef:
+    name: clone-build-push
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  workspaces:
+    - name: git-repo
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+    - name: docker-config
+      secret:
+        secretName: docker-config
+  params:
+    - name: git-repository-url
+      value: https://github.com/DovahkiinMato/ONPK_semestralka.git
+    - name: container-repo-url
+      value: docker.io/matejbabic/onpk-backend
+    - name: path-in-git-repo
+      value: apps/zauni-zadanie-appbackend-2024

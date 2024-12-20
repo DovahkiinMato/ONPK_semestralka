@@ -1,0 +1,63 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: clone-helm-upgrade-frontend
+  generateName: clone-helm-upgrade-frontend-
+spec:
+  pipelineRef:
+    name: clone-helm-upgrade
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  workspaces:
+    - name: shared-data
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+  params:
+    - name: git-repository-url
+      value: https://github.com/DovahkiinMato/ONPK_semestralka.git
+    - name: helm-charts_dir
+      value: charts/frontend
+    - name: helm-release-name
+      value: mbabic-frontend
+    - name: helm-release-namespace
+      value: webapp
+    - name: helm-upgrade-extra-params
+      value: ""
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: clone-helm-upgrade-backend
+  generateName: clone-helm-upgrade-backend-
+spec:
+  pipelineRef:
+    name: clone-helm-upgrade
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  workspaces:
+    - name: shared-data
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+  params:
+    - name: git-repository-url
+      value: https://github.com/DovahkiinMato/ONPK_semestralka.git
+    - name: helm-charts_dir
+      value: charts/backend
+    - name: helm-release-name
+      value: mbabic-backend
+    - name: helm-release-namespace
+      value: webapp
+    - name: helm-upgrade-extra-params
+      value: "--dependency-update"
